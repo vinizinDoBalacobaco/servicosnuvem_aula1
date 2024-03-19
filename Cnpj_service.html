@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <form id="meuFormulario">
+        <label for="cnpj">Consultar Cnpj:</label><br>
+        <input type="text" id="cnpj"><br>
+
+        <input type="button" onclick="callService()"></input>
+    </form>
+    <div id="dadosCnpj"></div>
+</body>
+
+</html>
+
+<script>
+    (function () {
+        var cors_api_host = 'cors-anywhere.herokuapp.com';
+        var cors_api_url = 'https://' + cors_api_host + '/';
+        var slice = [].slice;
+        var origin = window.location.protocol + '//' + window.location.host;
+        var open = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function () {
+            var args = slice.call(arguments);
+            var targetOrigin = /^https?:\/\/([^\/]+)/i.exec(args[1]);
+            if (targetOrigin && targetOrigin[0].toLowerCase() !== origin &&
+                targetOrigin[1] !== cors_api_host) {
+                args[1] = cors_api_url + args[1];
+            }
+            return open.apply(this, args);
+        };
+    })();
+    function callService() {
+        Cnpj = document.getElementById("cnpj").value.trim();
+        const url = 'https://cors-anywhere.herokuapp.com/https://receitaws.com.br/v1/cnpj/' + Cnpj;
+        const config = { method: 'GET', headers: { Accept: 'application/json' } };
+
+        if (Cnpj === null) {
+            alert("falta o cnpj");
+            return;
+        }
+        fetch(url, config)
+            .then(response => {
+                if (response.ok) {
+                    //alert("Sucesso");
+                    return response.json();
+                } else {
+                    alert("Erro ao fazer a solicitação");
+                }
+            })
+            .then(data => {
+                console.log(`Status: ${data.status}`);
+                console.log(`Última Atualização: ${data.ultima_atualizacao}`);
+                console.log(`CNPJ: ${data.cnpj}`);
+                console.log(`Tipo: ${data.tipo}`);
+                console.log(`Porte: ${data.porte}`);
+                console.log(`Nome: ${data.nome}`);
+                console.log(`Nome Fantasia: ${data.fantasia}`);
+                console.log(`Data de Abertura: ${data.abertura}`);
+                console.log(`Atividade Principal:`);
+                data.atividade_principal.forEach(atividade => {
+                    console.log(`- ${atividade.text} (${atividade.code})`);
+                });
+
+                console.log(`Atividades Secundárias:`);
+                data.atividades_secundarias.forEach(atividade => {
+                    console.log(`- ${atividade.text} (${atividade.code})`);
+                });
+                console.log(`Natureza Jurídica: ${data.natureza_juridica}`);
+                console.log(`Logradouro: ${data.logradouro}`);
+                console.log(`Número: ${data.numero}`);
+                console.log(`Complemento: ${data.complemento}`);
+                console.log(`CEP: ${data.cep}`);
+                console.log(`Bairro: ${data.bairro}`);
+                console.log(`Cidade: ${data.municipio}`);
+                console.log(`UF: ${data.uf}`);
+                console.log(`E-mail: ${data.email}`);
+                console.log(`Telefone: ${data.telefone}`);
+                console.log(`EFR (Estrutura Física do Registro): ${data.efr}`);
+                console.log(`Situação: ${data.situacao}`);
+                console.log(`Data da Situação: ${data.data_situacao}`);
+                console.log(`Motivo da Situação: ${data.motivo_situacao}`);
+                console.log(`Situação Especial: ${data.situacao_especial}`);
+                console.log(`Data da Situação Especial: ${data.data_situacao_especial}`);
+                console.log(`Capital Social: ${data.capital_social}`);
+                console.log(`QSA:`);
+                //socio = data.qsa;
+
+                data.qsa.forEach(socio => {
+                    console.log(`- Nome: ${socio.nome}`);
+                    console.log(`  Qualificação: ${socio.qual}`);
+                    console.log(`  País de Origem: ${socio.pais_origem}`);
+                    console.log(`  Nome do Representante Legal: ${socio.nome_rep_legal}`);
+                    console.log(`  Qualificação do Representante Legal: ${socio.qual_rep_legal}`);
+                });
+                console.log(`Billing:`);
+                console.log(`- Gratuito: ${data.billing.free}`);
+                console.log(`- Base de Dados: ${data.billing.database}`);
+                const dadosCnpj = document.getElementById("dadosCnpj");
+                const ul = document.createElement("ul");
+                    Object.entries(data).forEach(([key, value]) => {
+                        const li = document.createElement("li");
+                        li.textContent = `${key}: ${value}`;
+                        if (li.textContent.$value == "[object Object]") {
+                            li.li.textContent = [atividade];
+                        }
+                        ul.appendChild(li);
+                    });
+                    dadosCnpj.appendChild(ul);
+    }
+            )
+
+            .catch(error => {
+                alert("Erro ao requisitar o servico na nuvem");
+                console.error("Erro ao requisitar o serviço na nuvem", error);
+            })
+        }
+</script>
