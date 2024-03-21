@@ -89,8 +89,8 @@
                 console.log(`Situação Especial: ${data.situacao_especial}`);
                 console.log(`Data da Situação Especial: ${data.data_situacao_especial}`);
                 console.log(`Capital Social: ${data.capital_social}`);
+                console.log(`Conteúdo de data.qsa: ${data.qsa}`);
                 console.log(`QSA:`);
-                //socio = data.qsa;
 
                 data.qsa.forEach(socio => {
                     console.log(`- Nome: ${socio.nome}`);
@@ -103,22 +103,25 @@
                 console.log(`- Gratuito: ${data.billing.free}`);
                 console.log(`- Base de Dados: ${data.billing.database}`);
                 const dadosCnpj = document.getElementById("dadosCnpj");
+                dadosCnpj.innerHTML = "";
                 const ul = document.createElement("ul");
-                    Object.entries(data).forEach(([key, value]) => {
-                        const li = document.createElement("li");
+                Object.entries(data).forEach(([key, value]) => {
+                    const li = document.createElement("li");
+                    if (typeof value === 'object' && !Array.isArray(value)) {
+                        // Se for um objeto, converter em string JSON
+                        li.textContent = `${key}: ${JSON.stringify(value)}`;
+                    } else {
                         li.textContent = `${key}: ${value}`;
-                        if (li.textContent.$value == "[object Object]") {
-                            li.li.textContent = [atividade];
-                        }
-                        ul.appendChild(li);
-                    });
-                    dadosCnpj.appendChild(ul);
-    }
+                    }
+                    ul.appendChild(li);
+                });
+                dadosCnpj.appendChild(ul);
+            }
             )
 
             .catch(error => {
                 alert("Erro ao requisitar o servico na nuvem");
                 console.error("Erro ao requisitar o serviço na nuvem", error);
             })
-        }
+    }
 </script>
