@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Clima</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 70px);
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #weather-info {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        #weather-info h3 {
+            font-size: 20px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        #weather-info p {
+            margin-bottom: 5px;
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Consulta de Clima</h2>
+        <label for="city">Cidade:</label>
+        <input type="text" id="city" name="city" placeholder="Digite o nome da cidade">
+        <label for="country">País:</label>
+        <input type="text" id="country" name="country" placeholder="Digite o código do país (ex: BR)">
+        <button onclick="callService()">Consultar</button>
+        <div id="weather-info">
+            <!-- Aqui serão exibidas as informações do clima -->
+        </div>
+    </div>
+
+    <script>
+        function callService() {
+            var apiKey = 'ab79042932e6e0674ae9f9082d371043'; // Substitua pelo seu APPID do OpenWeatherMap
+            var city = document.getElementById("city").value.trim();
+            var country = document.getElementById("country").value.trim();
+            var apiLT = 'http://api.openweathermap.org/geo/1.0/direct?q=${city},${country}&appid=${apiKey}';
+            var lat = '';
+            var lon = '';
+            fetch(apiLT)
+            .then(response => {
+                if (response.ok) {
+                    return response.json()
+                } else {
+                    throw new Error('Erro ao fazer a solicitation');
+                }
+            })
+            .then(data => {
+                lat = data.city.lat;
+                lon = data.city.lon;
+            })
+
+            var api = `https://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${apiKey}&lang=pt_br`;
+
+            fetch(api)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Erro ao fazer a solicitação');
+                    }
+                })
+                .then(data => {
+                    // Manipula os dados recebidos
+                    displayWeather(data);
+                })
+                .catch(error => {
+                    alert("Erro ao requisitar o serviço na nuvem");
+                    console.error("Erro ao requisitar o serviço na nuvem", error);
+                });
+        }
+        function displayWeather(data) {
+            var weatherInfo = document.getElementById('weather-info');
+            weatherInfo.innerHTML = ''; // Limpa o conteúdo anterior, se houver
+
+            var cityName = document.createElement('h3');
+            cityName.textContent = `${data.name}, ${data.sys.country}`;
+
+            var temperature = document.createElement('p');
+            temperature.textContent = `Temperatura: ${(data.main.temp - 273.15).toFixed(2)} °C`;
+
+            var weatherDescription = document.createElement('p');
+            weatherDescription.textContent = `Descrição: ${data.weather[0].description}`;
+
+            weatherInfo.appendChild(cityName);
+            weatherInfo.appendChild(temperature);
+            weatherInfo.appendChild(weatherDescription);
+        }
+    </script>
+</body>
+</html>
