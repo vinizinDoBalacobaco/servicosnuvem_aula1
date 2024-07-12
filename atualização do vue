@@ -1,0 +1,133 @@
+<template>
+  <div id="a">
+    <input  type="text" v-model="form.meuInput" cols="30" rows="10">
+    <input type="button" value="Enviar" @click="run">
+    <div v-html="form.resposta"></div>
+    <!-- <textarea v-model="form.resposta" cols="30" rows="10"></textarea> -->
+  </div>
+</template>
+
+<script>
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+export default {
+  name: 'HelloWorld',
+  data() {
+    return {
+      form: {
+        meuInput: "",
+        resposta: ""
+      },
+      genAI: null,
+      model: null,
+      generationConfig: {
+        temperature: 1,
+        topP: 0.95,
+        topK: 64,
+        maxOutputTokens: 8192,
+        responseMimeType: "text/plain",
+      }
+    };
+  },
+  methods: {
+    async run() {
+
+        const apiKey = "AIzaSyA2IguhcKunUYQToJRvahkhLqrIU2X1Kig";
+        this.genAI = new GoogleGenerativeAI(apiKey);
+        this.model = this.genAI.getGenerativeModel({model: "gemini-1.5-flash"});
+
+      const chatSession = this.model.startChat({
+        generationConfig: this.generationConfig,
+        history: [
+          { role: "user", parts: [{ text: "hi" }] },
+          { role: "model", parts: [{ text: "hi \n" }] }
+        ]
+      });
+
+      const result = await chatSession.sendMessage(this.form.meuInput);
+      this.form.resposta = result.response.text();
+      console.log(result.response.text());
+    }
+  }
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+h3 {
+  margin: 40px 0 0;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+a {
+  color: #42b983;
+}
+
+/* styles.css */
+/* styles.css */
+
+#a {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  /* Removendo margem padrão */
+  padding: 20px;
+  /* Adicionando preenchimento */
+  align-items: center;
+  /* Centraliza verticalmente */
+  min-height: 100vh;
+  /* Garante que a página ocupe toda a altura da viewport */
+  background-color: #f0f0f0;
+}
+
+div {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+}
+input[type="text"] {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, transform 0.2s ease-out;
+}
+input[type="button"] {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, transform 0.2s ease-out;
+}
+
+input[type="button"]:hover {
+  background-color: #ff008c;
+  transform: scale(1.5);
+}
+
+input[type="button"]:active {
+  transform: scale(0.5);
+}
+</style>
